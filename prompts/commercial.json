@@ -1,0 +1,44 @@
+{
+  "templates": [
+    {
+      "name": "comparison_review",
+      "weight": 1.5,
+      "tone": "objetivo",
+      "length": 1000,
+      "structure": ["intro", "criteria", "comparison_table", "pros_cons", "verdict"],
+      "prompt": "Escribe una comparativa detallada de opciones y servicios de '{primary_kw}' en el sector {theme}. Incluye: introducción que justifica la comparación, tabla de criterios objetivos, análisis de pros y cons por opción, y veredicto final. Enlaza a '{target_url}' con anchor '{anchor_text}' como una de las opciones evaluadas. Tono: {tone}. ~{length} palabras. Keywords: {secondary_kws}."
+    },
+    {
+      "name": "benefits_focused",
+      "weight": 1.2,
+      "tone": "persuasivo",
+      "length": 900,
+      "structure": ["problem", "solution", "benefits", "proof", "cta"],
+      "prompt": "Desarrolla un artículo sobre los beneficios tangibles de '{primary_kw}' para empresas/profesionales de {theme}. Estructura: problema concreto → solución → 5 beneficios con ejemplos → evidencia/datos → llamada a la acción. Enlaza a '{target_url}' con anchor '{anchor_text}'. Tono: {tone}. Keywords secundarias: {secondary_kws}."
+    },
+    {
+      "name": "roi_case_study",
+      "weight": 0.9,
+      "tone": "analítico",
+      "length": 1100,
+      "structure": ["context", "challenge", "methodology", "results", "lessons"],
+      "prompt": "Crea un artículo tipo caso de estudio sobre el ROI de implementar '{primary_kw}' en {theme}. Incluye: contexto del desafío, metodología aplicada, resultados medibles (porcentajes, plazos), y lecciones replicables. Enlaza a '{target_url}' con anchor '{anchor_text}'. Tono: {tone}. Keywords: {secondary_kws}."
+    },
+    {
+      "name": "buyers_guide",
+      "weight": 1.0,
+      "tone": "práctico",
+      "length": 950,
+      "structure": ["intro", "what_to_look_for", "red_flags", "checklist", "recommendations"],
+      "prompt": "Escribe una guía del comprador/contratante para '{primary_kw}' en {theme}. Explica qué evaluar antes de decidir, señales de alerta, un checklist de evaluación y recomendaciones finales. Enlaza a '{target_url}' con anchor '{anchor_text}' como recurso recomendado. Tono: {tone}. Keywords: {secondary_kws}."
+    },
+    {
+      "name": "pricing_breakdown",
+      "weight": 0.7,
+      "tone": "transparente",
+      "length": 850,
+      "structure": ["intro", "pricing_models", "factors", "ranges", "budgeting_tips"],
+      "prompt": "Explica los modelos de precio y los factores que determinan el costo de '{primary_kw}' en {theme}. Incluye rangos de precio típicos por tier (básico, profesional, enterprise), qué incluye cada uno, y consejos para presupuestar correctamente. Enlaza a '{target_url}' con anchor '{anchor_text}'. Tono: {tone}. Keywords: {secondary_kws}."
+    }
+  ]
+}

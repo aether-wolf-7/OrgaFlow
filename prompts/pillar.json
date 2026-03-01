@@ -1,0 +1,44 @@
+{
+  "templates": [
+    {
+      "name": "comprehensive_guide",
+      "weight": 1.5,
+      "tone": "informativo",
+      "length": 1200,
+      "structure": ["intro", "definition", "benefits", "how_to", "tools", "conclusion"],
+      "prompt": "Escribe una guía SEO completa sobre '{primary_kw}' para el sitio '{title}'. Tema: {theme}. Tono: {tone}. Longitud: ~{length} palabras. Incluye: H1 con la keyword principal, H2 para (Qué es, Beneficios clave, Cómo implementarlo, Herramientas recomendadas), schema Article. Enlaza naturalmente a '{target_url}' con anchor '{anchor_text}'. Añade 1–2 enlaces externos de autoridad (no competencia directa). Keywords secundarias a incluir: {secondary_kws}."
+    },
+    {
+      "name": "step_by_step",
+      "weight": 1.2,
+      "tone": "práctico",
+      "length": 1000,
+      "structure": ["intro", "prerequisites", "steps", "tips", "conclusion"],
+      "prompt": "Crea una guía paso a paso sobre '{primary_kw}' orientada a profesionales de {theme}. Tono: {tone}. Estructura: introducción que define el problema → prerrequisitos → 5–7 pasos numerados con H3 → consejos avanzados → conclusión. Schema HowTo obligatorio. Enlaza a '{target_url}' con anchor '{anchor_text}'. Keywords secundarias: {secondary_kws}."
+    },
+    {
+      "name": "ultimate_reference",
+      "weight": 0.9,
+      "tone": "técnico",
+      "length": 1500,
+      "structure": ["overview", "deep_dive", "examples", "cases", "resources"],
+      "prompt": "Desarrolla un artículo de referencia exhaustivo sobre '{primary_kw}' dirigido a profesionales avanzados de {theme}. Incluye: visión general, análisis en profundidad, ejemplos prácticos con datos, métricas clave y recursos adicionales. Longitud: ~{length} palabras. Tono: {tone}. Enlaza a '{target_url}' con anchor '{anchor_text}'. Keywords secundarias: {secondary_kws}."
+    },
+    {
+      "name": "beginner_friendly",
+      "weight": 0.8,
+      "tone": "didáctico",
+      "length": 900,
+      "structure": ["intro", "basics", "examples", "next_steps"],
+      "prompt": "Explica '{primary_kw}' de forma accesible para quienes empiezan en {theme}. Evita jerga técnica sin explicarla. Usa analogías y ejemplos cotidianos. Tono: {tone}. ~{length} palabras. Enlaza a '{target_url}' con anchor '{anchor_text}'. Keywords secundarias: {secondary_kws}."
+    },
+    {
+      "name": "trend_analysis",
+      "weight": 0.7,
+      "tone": "analítico",
+      "length": 1100,
+      "structure": ["context", "trends", "data", "implications", "recommendations"],
+      "prompt": "Analiza las tendencias actuales en '{primary_kw}' para {theme}. Incluye contexto del mercado, datos y estadísticas relevantes de 2024–2025, implicaciones para profesionales y recomendaciones accionables. Tono: {tone}. Enlaza a '{target_url}' con anchor '{anchor_text}'. Keywords secundarias: {secondary_kws}."
+    }
+  ]
+}

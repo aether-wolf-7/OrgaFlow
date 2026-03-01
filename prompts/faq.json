@@ -1,0 +1,44 @@
+{
+  "templates": [
+    {
+      "name": "standard_faq",
+      "weight": 1.5,
+      "tone": "claro",
+      "length": 900,
+      "structure": ["intro", "faq_block_6_8", "conclusion"],
+      "prompt": "Crea un artículo FAQ/AEO optimizado para featured snippets sobre '{primary_kw}' en {theme}. Incluye 6–8 preguntas con respuestas concisas (50–100 palabras c/u) redactadas como respuesta directa desde la primera oración. Schema FAQPage obligatorio. Enlaza a '{target_url}' con anchor '{anchor_text}' en al menos 2 respuestas. Tono: {tone}. Keywords: {secondary_kws}."
+    },
+    {
+      "name": "expert_qa",
+      "weight": 1.0,
+      "tone": "experto",
+      "length": 1000,
+      "structure": ["intro", "expert_faq_5", "resources"],
+      "prompt": "Desarrolla un Q&A estilo experto sobre '{primary_kw}' para {theme}. Las preguntas deben reflejar búsquedas semánticas reales (People Also Ask). Respuestas detalladas (100–150 palabras c/u) con ejemplos prácticos. Schema FAQPage + Article. Enlaza a '{target_url}' con anchor '{anchor_text}'. Tono: {tone}. Keywords: {secondary_kws}."
+    },
+    {
+      "name": "howto_faq_hybrid",
+      "weight": 1.2,
+      "tone": "instructivo",
+      "length": 950,
+      "structure": ["intro", "howto_steps", "faq_block_5"],
+      "prompt": "Combina una guía HowTo con sección FAQ para '{primary_kw}'. Primera sección: 4–5 pasos rápidos con schema HowTo. Segunda sección: 5 preguntas frecuentes con schema FAQ. Ambas secciones enlazadas de forma natural a '{target_url}' con anchor '{anchor_text}'. Tono: {tone}. Keywords: {secondary_kws}."
+    },
+    {
+      "name": "myth_busting",
+      "weight": 0.8,
+      "tone": "directo",
+      "length": 850,
+      "structure": ["intro", "myths_5_6", "truth_recap", "conclusion"],
+      "prompt": "Crea un artículo desmintiendo 5–6 mitos comunes sobre '{primary_kw}' en {theme}. Por cada mito: afirmación incorrecta → por qué es falso → realidad respaldada por datos o evidencia. Formato pregunta/respuesta para AEO. Enlaza a '{target_url}' con anchor '{anchor_text}'. Tono: {tone}. Keywords: {secondary_kws}."
+    },
+    {
+      "name": "quick_answers",
+      "weight": 0.7,
+      "tone": "conciso",
+      "length": 750,
+      "structure": ["intro", "10_rapid_fire_qa"],
+      "prompt": "Escribe 10 respuestas cortas y directas (30–50 palabras c/u) a las preguntas más buscadas sobre '{primary_kw}'. Cada respuesta debe empezar con la respuesta, no con la pregunta parafraseada. Optimizado para Answer Engine Optimization y voice search. Schema FAQPage. Enlaza a '{target_url}' con anchor '{anchor_text}'. Tono: {tone}."
+    }
+  ]
+}
