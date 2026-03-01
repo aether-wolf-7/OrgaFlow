@@ -1,0 +1,173 @@
+{
+  "name": "OrgaFlow SEO Pipeline",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 12
+            }
+          ]
+        }
+      },
+      "id": "trigger-schedule",
+      "name": "Programar ejecución",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [240, 300],
+      "webhookId": ""
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "urls",
+              "name": "urls",
+              "value": "={{ $json.data }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "manual-trigger",
+      "name": "Ejecución manual",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [240, 480]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "",
+          "mode": "list"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "URLs",
+          "mode": "list"
+        },
+        "range": "A:B",
+        "options": {}
+      },
+      "id": "read-sheets",
+      "name": "Leer URLs (Google Sheets)",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [460, 300],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "",
+          "name": "Google Sheets account"
+        }
+      },
+      "disabled": true,
+      "notes": "Opcional: activar si la entrada es desde Sheets en lugar de CSV"
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.BACKEND_URL || 'http://localhost:8000' }}/run-pipeline",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"urls\": {{ JSON.stringify($json.url || $json.URL || $json.data) }},\n  \"dry_run\": true\n}",
+        "options": {}
+      },
+      "id": "http-backend",
+      "name": "Llamar backend OrgaFlow",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [680, 380],
+      "notes": "Backend FastAPI ejecuta pipeline.py; recibe URLs y devuelve job_id o log"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ $json }}"
+      },
+      "id": "format-result",
+      "name": "Formatear resultado",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [900, 380]
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
+      "id": "split-by-hub",
+      "name": "Procesar por hub (rate limit)",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [680, 520],
+      "notes": "En producción: ramas paralelas por hub con límite 2-4 posts/semana"
+    },
+    {
+      "parameters": {
+        "content": "## OrgaFlow Pipeline\n\nWorkflow de orquestación para el sistema de generación de contenido SEO.\n\n- **Entrada:** URLs desde Google Sheets o CSV (vía integración).\n- **Proceso:** Llamada al backend Python (pipeline.py) que ejecuta: crawl → análisis → keywords → anchors → generación 3 artículos → scheduling → publicación.\n- **Salida:** Log de ejecución, reporte HTML, registros en PostgreSQL.\n\nEl backend puede ejecutarse como servicio (FastAPI) o vía CLI; este workflow coordina la programación y la entrada de datos.",
+        "height": 320,
+        "width": 400
+      },
+      "id": "sticky-note",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [200, 80]
+    }
+  ],
+  "connections": {
+    "Programar ejecución": {
+      "main": [
+        [
+          {
+            "node": "Leer URLs (Google Sheets)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Leer URLs (Google Sheets)": {
+      "main": [
+        [
+          {
+            "node": "Llamar backend OrgaFlow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Llamar backend OrgaFlow": {
+      "main": [
+        [
+          {
+            "node": "Formatear resultado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "OrgaFlow",
+      "createdAt": "2026-03-01T00:00:00.000Z",
+      "updatedAt": "2026-03-01T00:00:00.000Z"
+    }
+  ],
+  "triggerCount": 1,
+  "meta": {
+    "templateCredsSetupCompleted": false
+  }
+}

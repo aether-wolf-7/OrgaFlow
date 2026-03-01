@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>OrgaFlow — Architecture Blueprint</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #07090e;
+      color: #e0e0e0;
+      font-family: system-ui, -apple-system, sans-serif;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    /* ── Header ── */
+    .header {
+      background: linear-gradient(135deg, #0f1117, #1a1d27);
+      border-bottom: 1px solid #2d3148;
+      padding: 18px 40px;
+      display: flex; align-items: center; gap: 16px;
+    }
+    .logo { font-size: 1.5rem; font-weight: 800; color: #7eb8f7; letter-spacing: -.5px; }
+    .badge { background: #1e3a5f; color: #7eb8f7; padding: 3px 10px; border-radius: 20px;
+             font-size: 11px; font-weight: 700; border: 1px solid #2d5a8e; }
+    .header-sub { color: #6b7280; font-size: 12px; margin-left: auto; }
+
+    /* ── Layout ── */
+    .page { max-width: 1340px; margin: 0 auto; padding: 32px 28px; }
+
+    .section-title {
+      font-size: 11px; font-weight: 700; letter-spacing: 1.5px;
+      text-transform: uppercase; color: #4b5563; margin-bottom: 16px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .section-title::after {
+      content: ''; flex: 1; height: 1px; background: #1f2335;
+    }
+
+    /* ── Cards ── */
+    .card {
+      background: #0f1117;
+      border: 1px solid #1f2335;
+      border-radius: 10px;
+      padding: 16px 18px;
+    }
+    .card-title {
+      font-size: 11px; font-weight: 700; letter-spacing: .8px;
+      text-transform: uppercase; margin-bottom: 10px;
+    }
+
+    /* ── Flow diagram ── */
+    .flow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+      margin-bottom: 40px;
+    }
+    .flow-layer {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .flow-box {
+      width: 100%;
+      max-width: 860px;
+      background: #0f1117;
+      border: 1px solid #1f2335;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .flow-box-head {
+      padding: 10px 18px;
+      display: flex; align-items: center; gap: 10px;
+      border-bottom: 1px solid #1f2335;
+    }
+    .flow-box-head .num {
+      width: 22px; height: 22px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 800; flex-shrink: 0;
+    }
+    .flow-box-head .label {
+      font-weight: 700; font-size: 13px;
+    }
+    .flow-box-head .sublabel {
+      font-size: 11px; color: #4b5563; margin-left: auto;
+    }
+    .flow-box-body {
+      padding: 12px 18px;
+      display: flex; flex-wrap: wrap; gap: 8px;
+    }
+    .chip {
+      background: #1a1d27;
+      border: 1px solid #2d3148;
+      border-radius: 6px;
+      padding: 5px 11px;
+      font-size: 12px;
+      color: #c9d1d9;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .chip .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+
+    .arrow-down {
+      width: 2px; height: 28px;
+      background: linear-gradient(to bottom, #2d3148, #3b82f6);
+      position: relative;
+      flex-shrink: 0;
+    }
+    .arrow-down::after {
+      content: '';
+      position: absolute; bottom: -6px; left: 50%;
+      transform: translateX(-50%);
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 7px solid #3b82f6;
+    }
+
+    /* Layer colors */
+    .l1 { border-top: 3px solid #6366f1; }
+    .l1 .num { background: #312e81; color: #a5b4fc; }
+    .l1 .label { color: #a5b4fc; }
+
+    .l2 { border-top: 3px solid #0ea5e9; }
+    .l2 .num { background: #0c4a6e; color: #7dd3fc; }
+    .l2 .label { color: #7dd3fc; }
+
+    .l3 { border-top: 3px solid #22c55e; }
+    .l3 .num { background: #14532d; color: #86efac; }
+    .l3 .label { color: #86efac; }
+
+    .l4 { border-top: 3px solid #f59e0b; }
+    .l4 .num { background: #451a03; color: #fcd34d; }
+    .l4 .label { color: #fcd34d; }
+
+    .l5 { border-top: 3px solid #ec4899; }
+    .l5 .num { background: #500724; color: #f9a8d4; }
+    .l5 .label { color: #f9a8d4; }
+
+    .l6 { border-top: 3px solid #8b5cf6; }
+    .l6 .num { background: #2e1065; color: #c4b5fd; }
+    .l6 .label { color: #c4b5fd; }
+
+    .l7 { border-top: 3px solid #14b8a6; }
+    .l7 .num { background: #042f2e; color: #5eead4; }
+    .l7 .label { color: #5eead4; }
+
+    .l8 { border-top: 3px solid #f43f5e; }
+    .l8 .num { background: #4c0519; color: #fda4af; }
+    .l8 .label { color: #fda4af; }
+
+    /* ── Hub grid ── */
+    .hub-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      margin-bottom: 40px;
+    }
+    @media(max-width: 900px) { .hub-grid { grid-template-columns: repeat(2, 1fr); } }
+    .hub-card {
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid #1f2335;
+    }
+    .hub-head {
+      padding: 10px 12px;
+      font-weight: 700; font-size: 12px;
+    }
+    .hub-body { padding: 10px 12px; background: #0f1117; }
+    .hub-row {
+      display: flex; align-items: flex-start; gap: 7px;
+      margin-bottom: 6px; font-size: 11px; color: #9ca3af;
+    }
+    .hub-row:last-child { margin-bottom: 0; }
+    .hub-icon { font-size: 13px; flex-shrink: 0; margin-top: 1px; }
+
+    /* ── Infra grid ── */
+    .infra-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      margin-bottom: 40px;
+    }
+    .infra-table th {
+      background: #1a1d27;
+      color: #6b7280;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .8px;
+      text-transform: uppercase;
+      padding: 9px 14px;
+      text-align: left;
+      border-bottom: 1px solid #2d3148;
+    }
+    .infra-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid #1a1d27;
+      color: #c9d1d9;
+      vertical-align: top;
+    }
+    .infra-table tr:last-child td { border-bottom: none; }
+    .infra-table tr:hover td { background: #0f1117; }
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      margin-right: 4px;
+      margin-bottom: 2px;
+    }
+
+    /* ── Timeline ── */
+    .timeline { display: flex; gap: 10px; margin-bottom: 40px; }
+    @media(max-width: 800px) { .timeline { flex-direction: column; } }
+    .tl-month {
+      flex: 1;
+      background: #0f1117;
+      border: 1px solid #1f2335;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .tl-head {
+      padding: 9px 14px;
+      font-weight: 700; font-size: 12px;
+      border-bottom: 1px solid #1f2335;
+      display: flex; align-items: center; gap: 7px;
+    }
+    .tl-body { padding: 10px 14px; font-size: 11px; color: #9ca3af; line-height: 1.8; }
+    .tl-badge {
+      padding: 2px 7px; border-radius: 10px;
+      font-size: 10px; font-weight: 700;
+    }
+
+    /* ── Risk model ── */
+    .risk-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 40px;
+    }
+    @media(max-width: 800px) { .risk-grid { grid-template-columns: 1fr; } }
+    .risk-card {
+      background: #0f1117;
+      border: 1px solid #1f2335;
+      border-radius: 10px;
+      padding: 14px 16px;
+    }
+    .risk-title {
+      font-weight: 700; font-size: 12px; margin-bottom: 8px;
+      display: flex; align-items: center; gap: 7px;
+    }
+    .risk-body { font-size: 11px; color: #9ca3af; line-height: 1.7; }
+
+    /* ── Rollback ── */
+    .rollback-flow {
+      display: flex; align-items: flex-start; gap: 0;
+      margin-bottom: 40px; overflow-x: auto; padding-bottom: 8px;
+    }
+    .rb-step {
+      background: #0f1117;
+      border: 1px solid #1f2335;
+      border-radius: 8px;
+      padding: 12px 14px;
+      min-width: 160px;
+      flex-shrink: 0;
+    }
+    .rb-step-title { font-weight: 700; font-size: 12px; margin-bottom: 6px; }
+    .rb-step-body { font-size: 11px; color: #9ca3af; line-height: 1.6; }
+    .rb-arrow {
+      display: flex; align-items: center; padding: 0 6px; flex-shrink: 0;
+      color: #3b82f6; font-size: 18px; margin-top: 20px;
+    }
+
+    /* ── Legend ── */
+    .legend {
+      display: flex; flex-wrap: wrap; gap: 14px;
+      margin-bottom: 32px;
+    }
+    .legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #9ca3af; }
+    .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+    /* colors */
+    .c-blue   { color: #7eb8f7; }
+    .c-green  { color: #22c55e; }
+    .c-yellow { color: #f59e0b; }
+    .c-purple { color: #a855f7; }
+    .c-pink   { color: #ec4899; }
+    .c-teal   { color: #14b8a6; }
+    .c-red    { color: #f43f5e; }
+    .c-indigo { color: #818cf8; }
+
+    .bg-blue   { background: #1e3a5f; }
+    .bg-green  { background: #14532d; }
+    .bg-yellow { background: #451a03; }
+    .bg-purple { background: #2e1065; }
+    .bg-teal   { background: #042f2e; }
+    .bg-red    { background: #4c0519; }
+
+    .b-blue   { border-color: #2d5a8e; }
+    .b-green  { border-color: #166534; }
+    .b-yellow { border-color: #713f12; }
+    .b-purple { border-color: #4c1d95; }
+
+    a { color: #7eb8f7; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .footnote {
+      margin-top: 40px;
+      padding: 16px 20px;
+      background: #0f1117;
+      border: 1px solid #1f2335;
+      border-radius: 8px;
+      font-size: 11px;
+      color: #4b5563;
+      line-height: 1.7;
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <span class="logo">OrgaFlow</span>
+  <span class="badge">BLUEPRINT v1.0</span>
+  <span class="header-sub">Architecture Document — Confidential · March 2026</span>
+</div>
+
+<div class="page">
+
+  <!-- ── LEGEND ── -->
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#6366f1"></div>Input & Ingestion</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#0ea5e9"></div>Orchestration</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#22c55e"></div>Analysis</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div>Keyword & Anchor Model</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#ec4899"></div>Content Generation</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#8b5cf6"></div>Publication Scheduler</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#14b8a6"></div>Editorial Hub Network</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#f43f5e"></div>Monitoring & Rollback</div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- SECTION 1 — MAIN PIPELINE FLOW                        -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="section-title">1 · Main Pipeline Flow</div>
+
+  <div class="flow" style="margin-bottom:40px">
+
+    <!-- Layer 1: Input -->
+    <div class="flow-layer">
+      <div class="flow-box l1">
+        <div class="flow-box-head">
+          <div class="num">1</div>
+          <div class="label">Input & Ingestion</div>
+          <div class="sublabel">CSV / Google Sheets · batch processing · URL deduplication</div>
+        </div>
+        <div class="flow-box-body">
+          <div class="chip"><div class="dot" style="background:#6366f1"></div>CSV with url column</div>
+          <div class="chip"><div class="dot" style="background:#6366f1"></div>Google Sheets via API</div>
+          <div class="chip"><div class="dot" style="background:#6366f1"></div>Batch loader (pandas)</div>
+          <div class="chip"><div class="dot" style="background:#6366f1"></div>URL normalisation</div>
+          <div class="chip"><div class="dot" style="background:#6366f1"></div>SHA-256 dedup check</div>
+          <div class="chip"><div class="dot" style="background:#6366f1"></div>Pilot cap (50 URLs)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-layer"><div class="arrow-down"></div></div>
+
+    <!-- Layer 2: Orchestration -->
+    <div class="flow-layer">
+      <div class="flow-box l2">
+        <div class="flow-box-head">
+          <div class="num">2</div>
+          <div class="label">Orchestration Engine</div>
+          <div class="sublabel">n8n workflows · async queue · randomised batch ordering</div>
+        </div>
+        <div class="flow-box-body">
+          <div class="chip"><div class="dot" style="background:#0ea5e9"></div>n8n workflow (JSON export)</div>
+          <div class="chip"><div class="dot" style="background:#0ea5e9"></div>Async queue — no sequential order</div>
+          <div class="chip"><div class="dot" style="background:#0ea5e9"></div>Per-hub rate limiter</div>
+          <div class="chip"><div class="dot" style="background:#0ea5e9"></div>Retry logic (3×) on crawl fail</div>
+          <div class="chip"><div class="dot" style="background:#0ea5e9"></div>Python/FastAPI backend</div>
+          <div class="chip"><div class="dot" style="background:#0ea5e9"></div>Residential proxy rotation (crawl)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-layer"><div class="arrow-down"></div></div>
+
+    <!-- Layer 3: Analysis -->
+    <div class="flow-layer">
+      <div class="flow-box l3">
+        <div class="flow-box-head">
+          <div class="num">3</div>
+          <div class="label">Automated Analysis</div>
+          <div class="sublabel">semantic extraction · theme detection · hub routing</div>
+        </div>
+        <div class="flow-box-body">
+          <div class="chip"><div class="dot" style="background:#22c55e"></div>HTTP crawl (requests + BS4)</div>
+          <div class="chip"><div class="dot" style="background:#22c55e"></div>Title / H1 / meta extraction</div>
+          <div class="chip"><div class="dot" style="background:#22c55e"></div>Body text semantic sample</div>
+          <div class="chip"><div class="dot" style="background:#22c55e"></div>Theme classifier (5 categories)</div>
+          <div class="chip"><div class="dot" style="background:#22c55e"></div>Intent classifier (informacional / comercial / local)</div>
+          <div class="chip"><div class="dot" style="background:#22c55e"></div>Hub router (keyword match score)</div>
+          <div class="chip"><div class="dot" style="background:#22c55e"></div>CrawlResult dataclass → pipeline</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-layer"><div class="arrow-down"></div></div>
+
+    <!-- Layer 4: Keywords & Anchors -->
+    <div class="flow-layer">
+      <div class="flow-box l4">
+        <div class="flow-box-head">
+          <div class="num">4</div>
+          <div class="label">Keyword Clustering + Anchor Model</div>
+          <div class="sublabel">intent-based clusters · Dirichlet(α=[6,4,6,4]) · anti-cannibalization</div>
+        </div>
+        <div class="flow-box-body">
+          <div class="chip"><div class="dot" style="background:#f59e0b"></div>Primary keyword (from title/H1)</div>
+          <div class="chip"><div class="dot" style="background:#f59e0b"></div>5–8 secondary keywords</div>
+          <div class="chip"><div class="dot" style="background:#f59e0b"></div>Long-tail by intent (6 templates)</div>
+          <div class="chip"><div class="dot" style="background:#f59e0b"></div>TF-IDF cosine similarity check</div>
+          <div class="chip"><div class="dot" style="background:#f59e0b"></div>Cannibalization threshold 0.85</div>
+          <div class="chip"><div class="dot" style="background:#f59e0b"></div>Brand anchor ~30%</div>
+          <div class="chip"><div class="dot" style="background:#f59e0b"></div>Exact URL anchor ~20%</div>
+          <div class="chip"><div class="dot" style="background:#f59e0b"></div>Partial match ~30%</div>
+          <div class="chip"><div class="dot" style="background:#f59e0b"></div>Generic anchor ~20%</div>
+          <div class="chip"><div class="dot" style="background:#f59e0b"></div>Per-URL stochastic draw</div>
+          <div class="chip"><div class="dot" style="background:#f59e0b"></div>Alert: Brand &gt;40% or Exact &gt;30%</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-layer"><div class="arrow-down"></div></div>
+
+    <!-- Layer 5: Content Generation -->
+    <div class="flow-layer">
+      <div class="flow-box l5">
+        <div class="flow-box-head">
+          <div class="num">5</div>
+          <div class="label">Content Generation (3 articles / URL)</div>
+          <div class="sublabel">15 rotating templates · schema markup · mock or OpenAI</div>
+        </div>
+        <div class="flow-box-body">
+          <div class="chip"><div class="dot" style="background:#ec4899"></div><strong>Article 1 — Pillar</strong>: guía completa · H1–H3 · Article schema</div>
+          <div class="chip"><div class="dot" style="background:#ec4899"></div><strong>Article 2 — Commercial</strong>: comparativa/precios · LocalBusiness schema</div>
+          <div class="chip"><div class="dot" style="background:#ec4899"></div><strong>Article 3 — FAQ/AEO</strong>: preguntas frecuentes · FAQPage + HowTo schema</div>
+          <div class="chip"><div class="dot" style="background:#ec4899"></div>Meta title + meta description per article</div>
+          <div class="chip"><div class="dot" style="background:#ec4899"></div>Contextual links → target URL</div>
+          <div class="chip"><div class="dot" style="background:#ec4899"></div>External authority links</div>
+          <div class="chip"><div class="dot" style="background:#ec4899"></div>Image ALT text optimised</div>
+          <div class="chip"><div class="dot" style="background:#ec4899"></div>Prompt rotation (5 templates × 3 types)</div>
+          <div class="chip"><div class="dot" style="background:#ec4899"></div>Monthly template refresh in production</div>
+          <div class="chip"><div class="dot" style="background:#ec4899"></div>SHA-256 content dedup block</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-layer"><div class="arrow-down"></div></div>
+
+    <!-- Layer 6: Scheduler -->
+    <div class="flow-layer">
+      <div class="flow-box l6">
+        <div class="flow-box-head">
+          <div class="num">6</div>
+          <div class="label">Publication Scheduler</div>
+          <div class="sublabel">Poisson(λ=3/week) · business-hour bias · no cross-hub synchronisation</div>
+        </div>
+        <div class="flow-box-body">
+          <div class="chip"><div class="dot" style="background:#8b5cf6"></div>Poisson process per hub (λ=3/week)</div>
+          <div class="chip"><div class="dot" style="background:#8b5cf6"></div>Business-hour bias (9h–18h)</div>
+          <div class="chip"><div class="dot" style="background:#8b5cf6"></div>Randomised batch ordering</div>
+          <div class="chip"><div class="dot" style="background:#8b5cf6"></div>2–4 posts/week hard cap per hub</div>
+          <div class="chip"><div class="dot" style="background:#8b5cf6"></div>No simultaneous publish across hubs</div>
+          <div class="chip"><div class="dot" style="background:#8b5cf6"></div>Draft-first flow → human review</div>
+          <div class="chip"><div class="dot" style="background:#8b5cf6"></div>Staging instance before production</div>
+          <div class="chip"><div class="dot" style="background:#8b5cf6"></div>WordPress REST API (application password)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-layer"><div class="arrow-down"></div></div>
+
+    <!-- Layer 7: Hub Network -->
+    <div class="flow-layer">
+      <div class="flow-box l7">
+        <div class="flow-box-head">
+          <div class="num">7</div>
+          <div class="label">Editorial Hub Network — 5 Hubs</div>
+          <div class="sublabel">separate ASN · separate DNS provider · separate CMS theme · no shared footprint</div>
+        </div>
+        <div class="flow-box-body">
+          <div class="chip"><div class="dot" style="background:#14b8a6"></div>Hub 1: Estrategia &amp; Negocios</div>
+          <div class="chip"><div class="dot" style="background:#14b8a6"></div>Hub 2: Tecnología &amp; Innovación</div>
+          <div class="chip"><div class="dot" style="background:#14b8a6"></div>Hub 3: Marketing Digital</div>
+          <div class="chip"><div class="dot" style="background:#14b8a6"></div>Hub 4: Educación &amp; Formación</div>
+          <div class="chip"><div class="dot" style="background:#14b8a6"></div>Hub 5: Industria &amp; Operaciones</div>
+          <div class="chip"><div class="dot" style="background:#14b8a6"></div>Semantic match &gt;80% required to link</div>
+          <div class="chip"><div class="dot" style="background:#14b8a6"></div>Each hub editorially self-sufficient</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-layer"><div class="arrow-down"></div></div>
+
+    <!-- Layer 8: Monitoring -->
+    <div class="flow-layer">
+      <div class="flow-box l8">
+        <div class="flow-box-head">
+          <div class="num">8</div>
+          <div class="label">Monitoring, Idempotency &amp; Rollback</div>
+          <div class="sublabel">PostgreSQL · Metabase · GSC API · SHA-256 hash · auto-pause</div>
+        </div>
+        <div class="flow-box-body">
+          <div class="chip"><div class="dot" style="background:#f43f5e"></div>PostgreSQL — all events logged</div>
+          <div class="chip"><div class="dot" style="background:#f43f5e"></div>Metabase dashboard (indexation, CTR, anchors)</div>
+          <div class="chip"><div class="dot" style="background:#f43f5e"></div>GSC API integration (positions, impressions)</div>
+          <div class="chip"><div class="dot" style="background:#f43f5e"></div>Idempotency — SHA-256 per URL+type</div>
+          <div class="chip"><div class="dot" style="background:#f43f5e"></div>Cannibalization alerts</div>
+          <div class="chip"><div class="dot" style="background:#f43f5e"></div>Anchor over-optimisation alerts</div>
+          <div class="chip"><div class="dot" style="background:#f43f5e"></div>Rollback trigger: &gt;20% drop in 7 days</div>
+          <div class="chip"><div class="dot" style="background:#f43f5e"></div>Auto-pause hub queue on trigger</div>
+          <div class="chip"><div class="dot" style="background:#f43f5e"></div>Revert to draft + operator alert</div>
+          <div class="chip"><div class="dot" style="background:#f43f5e"></div>HTML report per execution (demo)</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /flow -->
+
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- SECTION 2 — HUB IDENTITY & DIFFERENTIATION           -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="section-title">2 · Editorial Hub Identity &amp; Differentiation</div>
+
+  <div class="hub-grid" style="margin-bottom:40px">
+
+    <div class="hub-card">
+      <div class="hub-head" style="background:#1e1b4b;color:#a5b4fc">Hub 1 · Estrategia &amp; Negocios</div>
+      <div class="hub-body">
+        <div class="hub-row"><span class="hub-icon">🌐</span>hub-negocios.com</div>
+        <div class="hub-row"><span class="hub-icon">🏢</span>SiteGround / Hetzner EU</div>
+        <div class="hub-row"><span class="hub-icon">📡</span>Cloudflare DNS (primary)</div>
+        <div class="hub-row"><span class="hub-icon">🎨</span>Theme: Astra Business</div>
+        <div class="hub-row"><span class="hub-icon">✍️</span>Tono: analítico, ejecutivo</div>
+        <div class="hub-row"><span class="hub-icon">🏷️</span>empresa · finanzas · startup · pyme · estrategia</div>
+      </div>
+    </div>
+
+    <div class="hub-card">
+      <div class="hub-head" style="background:#0c4a6e;color:#7dd3fc">Hub 2 · Tecnología &amp; Innovación</div>
+      <div class="hub-body">
+        <div class="hub-row"><span class="hub-icon">🌐</span>hub-tecnologia.com</div>
+        <div class="hub-row"><span class="hub-icon">🏢</span>DigitalOcean NYC / Vultr</div>
+        <div class="hub-row"><span class="hub-icon">📡</span>Namecheap DNS</div>
+        <div class="hub-row"><span class="hub-icon">🎨</span>Theme: GeneratePress Tech</div>
+        <div class="hub-row"><span class="hub-icon">✍️</span>Tono: técnico, preciso</div>
+        <div class="hub-row"><span class="hub-icon">🏷️</span>software · IA · cloud · datos · API</div>
+      </div>
+    </div>
+
+    <div class="hub-card">
+      <div class="hub-head" style="background:#14532d;color:#86efac">Hub 3 · Marketing Digital</div>
+      <div class="hub-body">
+        <div class="hub-row"><span class="hub-icon">🌐</span>hub-marketing.com</div>
+        <div class="hub-row"><span class="hub-icon">🏢</span>Kinsta / WP Engine</div>
+        <div class="hub-row"><span class="hub-icon">📡</span>Porkbun DNS</div>
+        <div class="hub-row"><span class="hub-icon">🎨</span>Theme: Kadence Creative</div>
+        <div class="hub-row"><span class="hub-icon">✍️</span>Tono: conversacional, orientado a resultados</div>
+        <div class="hub-row"><span class="hub-icon">🏷️</span>SEO · ads · branding · leads · conversión</div>
+      </div>
+    </div>
+
+    <div class="hub-card">
+      <div class="hub-head" style="background:#451a03;color:#fcd34d">Hub 4 · Educación &amp; Formación</div>
+      <div class="hub-body">
+        <div class="hub-row"><span class="hub-icon">🌐</span>hub-educacion.com</div>
+        <div class="hub-row"><span class="hub-icon">🏢</span>OVHcloud EU / Contabo</div>
+        <div class="hub-row"><span class="hub-icon">📡</span>Dynadot DNS</div>
+        <div class="hub-row"><span class="hub-icon">🎨</span>Theme: Blocksy Academy</div>
+        <div class="hub-row"><span class="hub-icon">✍️</span>Tono: pedagógico, estructurado</div>
+        <div class="hub-row"><span class="hub-icon">🏷️</span>cursos · certificación · habilidades · tutorial</div>
+      </div>
+    </div>
+
+    <div class="hub-card">
+      <div class="hub-head" style="background:#042f2e;color:#5eead4">Hub 5 · Industria &amp; Operaciones</div>
+      <div class="hub-body">
+        <div class="hub-row"><span class="hub-icon">🌐</span>hub-industria.com</div>
+        <div class="hub-row"><span class="hub-icon">🏢</span>Linode / ScalaHosting</div>
+        <div class="hub-row"><span class="hub-icon">📡</span>Google Domains / Squarespace DNS</div>
+        <div class="hub-row"><span class="hub-icon">🎨</span>Theme: Hello Elementor Industrial</div>
+        <div class="hub-row"><span class="hub-icon">✍️</span>Tono: especializado, directo</div>
+        <div class="hub-row"><span class="hub-icon">🏷️</span>manufactura · logística · supply chain · calidad</div>
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- SECTION 3 — INFRASTRUCTURE SEPARATION (ASN/DNS)      -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="section-title">3 · Infrastructure Separation — Anti-Footprint Matrix</div>
+
+  <table class="infra-table">
+    <thead>
+      <tr>
+        <th>Layer</th>
+        <th>Hub 1 · Negocios</th>
+        <th>Hub 2 · Tecnología</th>
+        <th>Hub 3 · Marketing</th>
+        <th>Hub 4 · Educación</th>
+        <th>Hub 5 · Industria</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Hosting Provider</strong></td>
+        <td><span class="tag bg-blue b-blue c-blue">SiteGround</span></td>
+        <td><span class="tag bg-green b-green c-green">DigitalOcean</span></td>
+        <td><span class="tag bg-yellow b-yellow c-yellow">Kinsta</span></td>
+        <td><span class="tag bg-purple b-purple c-purple">OVHcloud</span></td>
+        <td><span class="tag bg-teal" style="border:1px solid #134e4a;color:#5eead4">Linode</span></td>
+      </tr>
+      <tr>
+        <td><strong>ASN / Network</strong></td>
+        <td>AS47583 (EU)</td>
+        <td>AS14061 (US-East)</td>
+        <td>AS396982 (US-West)</td>
+        <td>AS16276 (EU-FR)</td>
+        <td>AS63949 (US-Central)</td>
+      </tr>
+      <tr>
+        <td><strong>IP Range</strong></td>
+        <td>185.x.x.x</td>
+        <td>104.x.x.x</td>
+        <td>35.x.x.x</td>
+        <td>54.x.x.x</td>
+        <td>72.x.x.x</td>
+      </tr>
+      <tr>
+        <td><strong>DNS Provider</strong></td>
+        <td>Cloudflare</td>
+        <td>Namecheap</td>
+        <td>Porkbun</td>
+        <td>Dynadot</td>
+        <td>Squarespace DNS</td>
+      </tr>
+      <tr>
+        <td><strong>Nameservers</strong></td>
+        <td>ns1/ns2.cloudflare.com</td>
+        <td>ns1/ns2.namecheap.com</td>
+        <td>ns1/ns2.porkbun.com</td>
+        <td>ns1/ns2.dynadot.com</td>
+        <td>ns1/ns2.squarespace.com</td>
+      </tr>
+      <tr>
+        <td><strong>CMS Theme</strong></td>
+        <td>Astra Business</td>
+        <td>GeneratePress</td>
+        <td>Kadence</td>
+        <td>Blocksy</td>
+        <td>Hello Elementor</td>
+      </tr>
+      <tr>
+        <td><strong>Plugin Stack</strong></td>
+        <td>RankMath · WP Rocket · Smush</td>
+        <td>Yoast · LiteSpeed · ShortPixel</td>
+        <td>SEOPress · W3 Total · Imagify</td>
+        <td>All-in-One SEO · WP Super Cache · Optimole</td>
+        <td>Squirrly · WP Fastest · EWWW</td>
+      </tr>
+      <tr>
+        <td><strong>Domain Registrar</strong></td>
+        <td>GoDaddy</td>
+        <td>Namecheap</td>
+        <td>Porkbun</td>
+        <td>Dynadot</td>
+        <td>Google Domains</td>
+      </tr>
+      <tr>
+        <td><strong>WHOIS Privacy</strong></td>
+        <td colspan="5" style="color:#6b7280">Enabled on all hubs — different privacy providers per registrar</td>
+      </tr>
+      <tr>
+        <td><strong>Content Language</strong></td>
+        <td>ES-ES neutral</td>
+        <td>ES-ES técnico</td>
+        <td>ES-ES / ES-MX mix</td>
+        <td>ES-ES académico</td>
+        <td>ES-ES especializado</td>
+      </tr>
+      <tr>
+        <td><strong>Publish Cadence</strong></td>
+        <td>Tue / Thu</td>
+        <td>Mon / Wed</td>
+        <td>Wed / Fri</td>
+        <td>Mon / Thu</td>
+        <td>Tue / Fri</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- SECTION 4 — EXPANSION TIMELINE (Months 1–6)          -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="section-title">4 · Progressive Expansion Timeline — Months 1–6</div>
+
+  <div class="timeline">
+
+    <div class="tl-month">
+      <div class="tl-head" style="background:#1e1b4b">
+        <span class="tl-badge" style="background:#312e81;color:#a5b4fc">M1</span>
+        <span style="color:#a5b4fc">Pilot Build</span>
+      </div>
+      <div class="tl-body">
+        · System setup &amp; docs<br>
+        · 1 hub live (Hub 2)<br>
+        · 20–50 URLs processed<br>
+        · Crawl + gen + publish<br>
+        · Indexation baseline<br>
+        · GSC connected<br>
+        · Dashboard live
+      </div>
+    </div>
+
+    <div class="tl-month">
+      <div class="tl-head" style="background:#0c4a6e">
+        <span class="tl-badge" style="background:#075985;color:#7dd3fc">M2</span>
+        <span style="color:#7dd3fc">Validation</span>
+      </div>
+      <div class="tl-body">
+        · Pilot KPIs reviewed<br>
+        · Indexation &gt;70%?<br>
+        · No GSC issues<br>
+        · Hub 1 launched<br>
+        · 50–150 URLs total<br>
+        · Rollback tested<br>
+        · Template refresh #1
+      </div>
+    </div>
+
+    <div class="tl-month">
+      <div class="tl-head" style="background:#14532d">
+        <span class="tl-badge" style="background:#166534;color:#86efac">M3</span>
+        <span style="color:#86efac">Scale ×3</span>
+      </div>
+      <div class="tl-body">
+        · Hub 3 launched<br>
+        · 150–400 URLs total<br>
+        · Proxy rotation live<br>
+        · n8n parallel branches<br>
+        · Anchor audit #1<br>
+        · Cannibalization review
+      </div>
+    </div>
+
+    <div class="tl-month">
+      <div class="tl-head" style="background:#451a03">
+        <span class="tl-badge" style="background:#713f12;color:#fcd34d">M4</span>
+        <span style="color:#fcd34d">Scale ×6</span>
+      </div>
+      <div class="tl-body">
+        · Hubs 4 + 5 launched<br>
+        · 400–800 URLs total<br>
+        · All 5 hubs active<br>
+        · PostgreSQL migration<br>
+        · Metabase full metrics<br>
+        · CTR trend analysis
+      </div>
+    </div>
+
+    <div class="tl-month">
+      <div class="tl-head" style="background:#2e1065">
+        <span class="tl-badge" style="background:#4c1d95;color:#c4b5fd">M5</span>
+        <span style="color:#c4b5fd">Scale ×15</span>
+      </div>
+      <div class="tl-body">
+        · 800–1,200 URLs total<br>
+        · Template refresh #2<br>
+        · Prompt rotation audit<br>
+        · Anchor model tuning<br>
+        · GSC anomaly check<br>
+        · Runbook update
+      </div>
+    </div>
+
+    <div class="tl-month">
+      <div class="tl-head" style="background:#042f2e">
+        <span class="tl-badge" style="background:#134e4a;color:#5eead4">M6</span>
+        <span style="color:#5eead4">2,000+ Scale</span>
+      </div>
+      <div class="tl-body">
+        · 1,200–2,000+ URLs<br>
+        · Full cadence active<br>
+        · Monthly KPI report<br>
+        · Expansion planning<br>
+        · Cost optimisation<br>
+        · Internal team handoff
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- SECTION 5 — RISK MANAGEMENT MODEL                    -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="section-title">5 · Risk Management — Simultaneous Multi-Hub Drop Model</div>
+
+  <div class="risk-grid">
+
+    <div class="risk-card">
+      <div class="risk-title">
+        <span style="color:#f59e0b;font-size:16px">⚡</span>
+        <span style="color:#fcd34d">Trigger Thresholds</span>
+      </div>
+      <div class="risk-body">
+        <strong style="color:#c9d1d9">Level 1 — Watch:</strong><br>
+        · Single hub: &gt;15% impression drop in 7 days<br>
+        · Alert sent to dashboard, no pause<br><br>
+        <strong style="color:#c9d1d9">Level 2 — Alert:</strong><br>
+        · Single hub: &gt;20% drop in 7 days<br>
+        · Publish queue paused for that hub<br>
+        · Operator notified immediately<br><br>
+        <strong style="color:#c9d1d9">Level 3 — Critical:</strong><br>
+        · 2+ hubs: &gt;20% drop simultaneously<br>
+        · All hubs paused<br>
+        · Full audit initiated
+      </div>
+    </div>
+
+    <div class="risk-card">
+      <div class="risk-title">
+        <span style="color:#22c55e;font-size:16px">🛡️</span>
+        <span style="color:#86efac">Isolation Protocol</span>
+      </div>
+      <div class="risk-body">
+        <strong style="color:#c9d1d9">Why hubs are isolated:</strong><br>
+        · Separate ASN = different network origin<br>
+        · Separate DNS = no shared NS pattern<br>
+        · Separate IP = no IP-block correlation<br>
+        · Separate theme/plugins = no CMS fingerprint<br>
+        · Different publish days = no temporal pattern<br><br>
+        <strong style="color:#c9d1d9">Result:</strong><br>
+        A simultaneous drop affecting 2+ hubs indicates an algorithm update (sitewide signal), not a network pattern detection. Isolation means one hub cannot "contaminate" another.
+      </div>
+    </div>
+
+    <div class="risk-card">
+      <div class="risk-title">
+        <span style="color:#f43f5e;font-size:16px">🔄</span>
+        <span style="color:#fda4af">Recovery Actions</span>
+      </div>
+      <div class="risk-body">
+        <strong style="color:#c9d1d9">Immediate (0–24h):</strong><br>
+        · Auto-pause affected hub queue<br>
+        · Revert last 5 articles to draft<br>
+        · GSC manual inspection<br><br>
+        <strong style="color:#c9d1d9">Short-term (1–7 days):</strong><br>
+        · Content quality audit<br>
+        · Anchor distribution review<br>
+        · Template rotation refresh<br><br>
+        <strong style="color:#c9d1d9">Recovery (7–30 days):</strong><br>
+        · Gradual resume (1 post/week)<br>
+        · Monitor re-indexation<br>
+        · Resume normal cadence if stable
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- SECTION 6 — ROLLBACK FLOW                            -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="section-title">6 · Rollback Flow</div>
+
+  <div class="rollback-flow">
+    <div class="rb-step" style="border-top:3px solid #f43f5e">
+      <div class="rb-step-title" style="color:#fda4af">GSC Signal</div>
+      <div class="rb-step-body">&gt;20% impression drop across ≥3 articles from same hub within 7 days</div>
+    </div>
+    <div class="rb-arrow">→</div>
+    <div class="rb-step" style="border-top:3px solid #f59e0b">
+      <div class="rb-step-title" style="color:#fcd34d">Auto-Pause</div>
+      <div class="rb-step-body">Hub publish queue paused. No new articles scheduled from this hub.</div>
+    </div>
+    <div class="rb-arrow">→</div>
+    <div class="rb-step" style="border-top:3px solid #a855f7">
+      <div class="rb-step-title" style="color:#c4b5fd">Revert Draft</div>
+      <div class="rb-step-body">Last 5 published articles set to draft + noindex via WP REST API.</div>
+    </div>
+    <div class="rb-arrow">→</div>
+    <div class="rb-step" style="border-top:3px solid #0ea5e9">
+      <div class="rb-step-title" style="color:#7dd3fc">Alert Sent</div>
+      <div class="rb-step-body">Metabase alert + email notification to operator with full log.</div>
+    </div>
+    <div class="rb-arrow">→</div>
+    <div class="rb-step" style="border-top:3px solid #22c55e">
+      <div class="rb-step-title" style="color:#86efac">Audit</div>
+      <div class="rb-step-body">Content quality, anchor profile, and template pattern review.</div>
+    </div>
+    <div class="rb-arrow">→</div>
+    <div class="rb-step" style="border-top:3px solid #14b8a6">
+      <div class="rb-step-title" style="color:#5eead4">Gradual Resume</div>
+      <div class="rb-step-body">1 post/week cadence after 7 stable days. Normal resume after 30 days.</div>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- SECTION 7 — DELIVERABLES & SCOPE                     -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="section-title">7 · Deliverables &amp; Budget Scope — USD 3,500</div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:40px">
+    <div class="card">
+      <div class="card-title" style="color:#22c55e">✓ Included in USD 3,500</div>
+      <div style="font-size:12px;line-height:2;color:#9ca3af">
+        · Architecture blueprint (this document + diagrams)<br>
+        · Full system implementation (Python/FastAPI + n8n)<br>
+        · Pilot: 1 hub live, 20–50 URLs end-to-end<br>
+        · 3 articles per URL (pillar + commercial + FAQ)<br>
+        · Dirichlet anchor model + cannibalization control<br>
+        · Poisson scheduler + draft-first publishing<br>
+        · Monitoring dashboard (Metabase + PostgreSQL)<br>
+        · HTML report per execution<br>
+        · Idempotency engine (SHA-256)<br>
+        · Rollback runbook (documented)<br>
+        · n8n workflows (.json exportable)<br>
+        · 15 rotating prompt templates (3 types × 5)<br>
+        · Infrastructure manifest (ASN/DNS/hosting spec)<br>
+        · Internal replication guide per new hub<br>
+        · Operational manual + incident runbook<br>
+        · Git repository (private, documented by module)
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:#f59e0b">⊘ Not included (operational costs, client's account)</div>
+      <div style="font-size:12px;line-height:2;color:#9ca3af">
+        · Hosting &amp; VPS per hub (~$10–25/hub/month)<br>
+        · Domain registration per hub (~$12–15/year each)<br>
+        · OpenAI / LLM API usage (~$0.01–0.03/article)<br>
+        · Residential proxy service (~$50–100/month)<br>
+        · Metabase Cloud (optional, free self-host available)<br>
+        · WordPress premium themes (optional, ~$40–80 one-time)
+      </div>
+    </div>
+  </div>
+
+  <div class="footnote">
+    <strong style="color:#c9d1d9">OrgaFlow Architecture Blueprint v1.0</strong> · Prepared by Angel · March 2026 ·
+    This document and the associated system are designed exclusively for white-hat, quality-first organic growth.
+    All anti-footprint measures are based on infrastructure diversification, statistical modelling (Dirichlet anchor model,
+    Poisson scheduling) and content quality gates.
+    Demo available at: <a href="https://nondevout-cleopatra-unsmashed.ngrok-free.dev" target="_blank">https://nondevout-cleopatra-unsmashed.ngrok-free.dev</a>
+  </div>
+
+</div><!-- /page -->
+</body>
+</html>

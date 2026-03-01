@@ -1,0 +1,152 @@
+Loaded 10 URL(s) from data/client_10urls.csv
+╭─────────────────────── Starting ───────────────────────╮
+│ SEO Content Pipeline                                   │
+│                                                        │
+│   URLs loaded : 10                                     │
+│   Mode        : PILOT                                  │
+│   LLM         : MOCK                                   │
+│   Dry-run     : True                                   │
+│   DB          : /home/ubuntu/OrgaFlow/data/pipeline.db │
+╰────────────────────────────────────────────────────────╯
+Pilot cap applied → processing 10 URLs
+
+  DRY [Pillar]      Guía Completa de Shopify: Todo lo que Necesitas Saber  
+anchor=qué es shopify
+  DRY [Commercial]  Servicios de Shopify: Comparativa y Precios 2025  
+anchor=https://www.shopify.com/es/
+  DRY [FAQ/AEO]     Preguntas Frecuentes sobre Shopify: Respuestas de Expertos  
+anchor=ver más
+  DRY [Pillar]      Guía Completa de Salesforce: el principal CRM con IA del mun
+anchor=Salesforce ES
+  DRY [Commercial]  Servicios de Salesforce: el principal CRM con IA del mundo |
+anchor=página web
+  DRY [FAQ/AEO]     Preguntas Frecuentes sobre Salesforce: el principal CRM con 
+anchor=Salesforce ES
+  DRY [Pillar]      Guía Completa de Kinsta® - el mejor alojamiento para WordPre
+anchor=el mejor alojamiento para Word
+  DRY [Commercial]  Servicios de Kinsta® - el mejor alojamiento para WordPress: 
+anchor=qué es kinsta®
+  DRY [FAQ/AEO]     Preguntas Frecuentes sobre Kinsta® - el mejor alojamiento pa
+anchor=el mejor alojamiento para Word
+  DRY [Pillar]      Guía Completa de WooCommerce: Todo lo que Necesitas Saber  
+anchor=qué es woocommerce
+  DRY [Commercial]  Servicios de WooCommerce: Comparativa y Precios 2025  
+anchor=https://woocommerce.com/
+  DRY [FAQ/AEO]     Preguntas Frecuentes sobre WooCommerce: Respuestas de Expert
+anchor=WooCommerce
+  DRY [Pillar]      Guía Completa de SEO for everyone • Yoast: Todo lo que Neces
+anchor=leer artículo completo
+  DRY [Commercial]  Servicios de SEO for everyone • Yoast: Comparativa y Precios
+anchor=acceder aquí
+  DRY [FAQ/AEO]     Preguntas Frecuentes sobre SEO for everyone • Yoast: Respues
+anchor=qué es everyone
+WARNING modules.crawler: HTTP error crawling https://www.hubspot.com/es/: 404 Client Error: Not Found for url: https://www.hubspot.com/es/
+  ✗ Crawl failed: HTTP 404
+  DRY [Pillar]      Guía Completa de Semrush: herramientas de marketing basadas 
+anchor=sitio oficial
+  DRY [Commercial]  Servicios de Semrush: herramientas de marketing basadas en d
+anchor=conocer más
+  DRY [FAQ/AEO]     Preguntas Frecuentes sobre Semrush: herramientas de marketin
+anchor=herramientas de marketing basa
+  DRY [Pillar]      Guía Completa de Plataforma de Email Marketing | Mailchimp: 
+anchor=https://www.mailchimp.com/es/
+  DRY [Commercial]  Servicios de Plataforma de Email Marketing | Mailchimp: Comp
+anchor=qué es plataforma
+  DRY [FAQ/AEO]     Preguntas Frecuentes sobre Plataforma de Email Marketing | M
+anchor=Mailchimp
+  DRY [Pillar]      Guía Completa de Buffer: Social media management for everyon
+anchor=https://buffer.com/
+  DRY [Commercial]  Servicios de Buffer: Social media management for everyone: C
+anchor=conocer más
+  DRY [FAQ/AEO]     Preguntas Frecuentes sobre Buffer: Social media management f
+anchor=sitio oficial
+WARNING modules.crawler: HTTP error crawling https://www.canva.com/es/: 403 Client Error: Forbidden for url: https://www.canva.com/es/
+  ✗ Crawl failed: HTTP 403
+  https://www.canva.com/es/ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 10/10 0:00:06
+
+
+────────────────────────────── Post-run analysis ───────────────────────────────
+WARN: 42 potential cannibalization pair(s) detected:
+   Articles #1 vs #4  similarity=0.941
+   Articles #1 vs #7  similarity=0.940
+   Articles #1 vs #10  similarity=0.954
+   Articles #1 vs #13  similarity=0.951
+   Articles #1 vs #16  similarity=0.944
+   Articles #1 vs #19  similarity=0.950
+   Articles #1 vs #22  similarity=0.947
+   Articles #2 vs #5  similarity=0.854
+   Articles #2 vs #8  similarity=0.850
+   Articles #2 vs #11  similarity=0.904
+   Articles #2 vs #14  similarity=0.878
+   Articles #2 vs #17  similarity=0.881
+   Articles #2 vs #20  similarity=0.889
+   Articles #2 vs #23  similarity=0.874
+   Articles #4 vs #7  similarity=0.922
+   Articles #4 vs #10  similarity=0.940
+   Articles #4 vs #13  similarity=0.938
+   Articles #4 vs #16  similarity=0.930
+   Articles #4 vs #19  similarity=0.936
+   Articles #4 vs #22  similarity=0.935
+   Articles #7 vs #10  similarity=0.936
+   Articles #7 vs #13  similarity=0.932
+   Articles #7 vs #16  similarity=0.925
+   Articles #7 vs #19  similarity=0.932
+   Articles #7 vs #22  similarity=0.929
+   Articles #10 vs #13  similarity=0.951
+   Articles #10 vs #16  similarity=0.944
+   Articles #10 vs #19  similarity=0.950
+   Articles #10 vs #22  similarity=0.947
+   Articles #11 vs #14  similarity=0.876
+   Articles #11 vs #17  similarity=0.868
+   Articles #11 vs #20  similarity=0.886
+   Articles #11 vs #23  similarity=0.867
+   Articles #13 vs #16  similarity=0.940
+   Articles #13 vs #19  similarity=0.946
+   Articles #13 vs #22  similarity=0.945
+   Articles #14 vs #20  similarity=0.861
+   Articles #16 vs #19  similarity=0.953
+   Articles #16 vs #22  similarity=0.938
+   Articles #17 vs #20  similarity=0.897
+   Articles #19 vs #22  similarity=0.942
+   Articles #20 vs #23  similarity=0.853
+
+                                Pipeline Summary                                
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━┓
+┃ URL                            ┃ Hub       ┃ Theme    ┃ Articles ┃ Status    ┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━┩
+│ https://www.shopify.com/es/    │ Estrateg… │ negocios │    3     │ OK        │
+│                                │ &         │          │          │           │
+│                                │ Negocios  │          │          │           │
+│ https://www.salesforce.com/es/ │ Tecnolog… │ tecnolo… │    3     │ OK        │
+│                                │ &         │          │          │           │
+│                                │ Innovaci… │          │          │           │
+│ https://kinsta.com/es/         │ Tecnolog… │ tecnolo… │    3     │ OK        │
+│                                │ &         │          │          │           │
+│                                │ Innovaci… │          │          │           │
+│ https://woocommerce.com/       │ Tecnolog… │ tecnolo… │    3     │ OK        │
+│                                │ &         │          │          │           │
+│                                │ Innovaci… │          │          │           │
+│ https://yoast.com/             │ Tecnolog… │ tecnolo… │    3     │ OK        │
+│                                │ &         │          │          │           │
+│                                │ Innovaci… │          │          │           │
+│ https://www.hubspot.com/es/    │ -         │ -        │    0     │ crawl_er… │
+│ https://www.semrush.com/es/    │ Marketing │ marketi… │    3     │ OK        │
+│                                │ Digital   │          │          │           │
+│ https://www.mailchimp.com/es/  │ Estrateg… │ negocios │    3     │ OK        │
+│                                │ &         │          │          │           │
+│                                │ Negocios  │          │          │           │
+│ https://buffer.com/            │ Tecnolog… │ tecnolo… │    3     │ OK        │
+│                                │ &         │          │          │           │
+│                                │ Innovaci… │          │          │           │
+│ https://www.canva.com/es/      │ -         │ -        │    0     │ crawl_er… │
+└────────────────────────────────┴───────────┴──────────┴──────────┴───────────┘
+╭───────────────────────── Anchor Distribution Model ──────────────────────────╮
+│   Brand:          25.7%  (target ≈ 30%)                                      │
+│   Exact URL:      16.7%  (target ≈ 20%)                                      │
+│   Partial match:  34.5%  (target ≈ 30%)                                      │
+│   Generic:        23.0%  (target ≈ 20%)                                      │
+│                                                                              │
+│   Sampled via Dirichlet(α=[6,4,6,4]) — 8 URL(s)                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+Report: /home/ubuntu/OrgaFlow/reports/report_20260301_225812.html

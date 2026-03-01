@@ -77,6 +77,22 @@ async def index():
     return _build_page(total, generated, articles_html)
 
 
+def _reset_demo_urls(url_list: list[str]) -> int:
+    """Delete pipeline_runs and content_hashes for given URLs so the demo always runs fresh."""
+    db = BASE_DIR / "data" / "pipeline.db"
+    if not db.exists() or not url_list:
+        return 0
+    conn = sqlite3.connect(str(db))
+    deleted = 0
+    for url in url_list:
+        n = conn.execute("DELETE FROM pipeline_runs WHERE url = ?", (url,)).rowcount
+        conn.execute("DELETE FROM content_hashes WHERE url = ?", (url,))
+        deleted += n
+    conn.commit()
+    conn.close()
+    return deleted
+
+
 @app.get("/run")
 async def run_stream(urls: str = ""):
     async def generate():
@@ -88,14 +104,28 @@ async def run_stream(urls: str = ""):
             temp_csv.write_text("url\n" + "\n".join(url_list) + "\n", encoding="utf-8")
             csv_arg = str(temp_csv)
         else:
+            url_list = []
             csv_arg = str(BASE_DIR / "data" / "sample_urls.csv")
+            # For the default sample CSV, collect all URLs to reset
+            try:
+                with open(csv_arg, encoding="utf-8") as f:
+                    reader = __import__("csv").DictReader(f)
+                    url_list = [r.get("url", r.get("URL", "")).strip() for r in reader]
+                    url_list = [u for u in url_list if u.startswith("http")]
+            except Exception:
+                pass
+
+        # Clear these URLs from the idempotency DB so the demo always shows the full pipeline
+        reset_count = _reset_demo_urls(url_list)
+        if reset_count:
+            yield f"data: [demo] Reset {reset_count} previous run(s) — running fresh pipeline...\n\n"
 
         env = {**os.environ, "PYTHONIOENCODING": "utf-8", "NO_COLOR": "1", "TERM": "dumb"}
 
         proc = await asyncio.create_subprocess_exec(
             sys.executable, str(BASE_DIR / "pipeline.py"), csv_arg, "--dry-run",
             stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.STDOUT,  # merge stderr so errors are visible in terminal
             env=env,
         )
 
@@ -104,13 +134,15 @@ async def run_stream(urls: str = ""):
             if not line:
                 break
             text = strip_ansi(line.decode("utf-8", errors="replace")).rstrip()
-            # Skip empty lines and pure box-drawing characters
-            clean = re.sub(r"[─│┌┐└┘├┤┬┴┼╴╵╶╷╸╹╺╻]+", "", text).strip()
+            # Strip box-drawing characters; only skip lines that become empty
+            clean = re.sub(r"[\u2500-\u257F\u2580-\u259F\u2502\u256D\u256E\u256F\u2570\u2571\u2572\u2573╌╍╎╏━┃┄┅┆┇┈┉┊┋╭╮╯╰╴╵╶╷╸╹╺╻]+", "", text).strip()
             if clean:
                 yield f"data: {text}\n\n"
 
-        await proc.wait()
+        rc = await proc.wait()
         yield "data: \n\n"
+        if rc != 0:
+            yield f"data: [ERROR] Pipeline exited with code {rc}. Check server logs.\n\n"
         yield "data: Pipeline finished.\n\n"
         yield "data: DONE\n\n"
 
@@ -119,6 +151,14 @@ async def run_stream(urls: str = ""):
         media_type="text/event-stream",
         headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
     )
+
+
+@app.get("/blueprint", response_class=HTMLResponse)
+async def blueprint():
+    bp = BASE_DIR / "blueprint.html"
+    if bp.exists():
+        return bp.read_text(encoding="utf-8")
+    return "<h1 style='color:white;padding:60px;background:#07090e;font-family:system-ui'>Blueprint not found.</h1>"
 
 
 @app.get("/report", response_class=HTMLResponse)
@@ -255,6 +295,7 @@ _HTML_TEMPLATE = r"""<!DOCTYPE html>
   <span class="logo">OrgaFlow</span>
   <span class="badge">DEMO</span>
   <span class="subtitle">SEO Content Pipeline &amp; Editorial Hub Network</span>
+  <a href="/blueprint" target="_blank" style="margin-left:auto;background:#1e3a5f;color:#7eb8f7;padding:5px 14px;border-radius:6px;font-size:12px;font-weight:700;border:1px solid #2d5a8e;text-decoration:none">Architecture Blueprint</a>
 </div>
 
 <div class="wrap">
